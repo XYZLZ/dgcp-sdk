@@ -11,3 +11,4 @@ tsconfig.json
 tsup.config.ts
 .prettierrc
 .eslint.config.ts
+tsconfig.json
