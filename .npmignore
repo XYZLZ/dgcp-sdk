@@ -1,0 +1,13 @@
+# Excluir la carpeta src
+src/
+
+# Excluir cualquier archivo de configuración que no quieras incluir
+.git/
+.github/
+node_modules/
+*.log
+*.ts
+tsconfig.json
+tsup.config.ts
+.prettierrc
+.eslint.config.ts

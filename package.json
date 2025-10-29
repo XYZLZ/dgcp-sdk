@@ -53,5 +53,11 @@
     "#errors/*": "./src/errors/*",
     "#core/*": "./src/core/*",
     "#root/*": "./src/*"
-  }
+  },
+
+  "files": [
+    "dist",
+    "README.md",
+    "tsconfig.json"
+  ]
 }
