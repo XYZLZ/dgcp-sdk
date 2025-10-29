@@ -12,7 +12,7 @@
     "publish": "npm publish --access restricted"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com/@xyzlz"
   },
   "repository": {
     "type": "git",
