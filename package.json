@@ -42,6 +42,7 @@
     "typescript-eslint": "8.46.2"
   },
   "dependencies": {
+    "@xyzlz/dgcp-sdk": "github:XYZLZ/dgcp-sdk",
     "axios": "1.13.1"
   },
   "imports": {
