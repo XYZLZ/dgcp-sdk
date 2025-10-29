@@ -56,7 +56,9 @@
   },
 
   "files": [
-    "dist",
-    "README.md"
+    "README.md",
+    "dist/main.d.ts",
+    "dist/main.js",
+    "dist/main.js.map"
   ]
 }
