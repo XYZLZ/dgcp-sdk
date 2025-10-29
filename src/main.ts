@@ -58,10 +58,10 @@ class DGCP {
     }
 }
 
-function dgcp(apikey: string, config: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
+function dgcp(apikey: string, config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
     return new DGCP(apikey, config)
 }
 
 export * from './types/api/api.js'
 export * from './errors/errors.js'
-export default { dgcp }
+export { dgcp }

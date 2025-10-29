@@ -30,6 +30,8 @@ export const DEFAULT_CONFIG: Partial<SDKConfig> = {
         retryDelay: 1000,
         retryableStatuses: [408, 429, 500, 502, 503, 504],
     },
+    version: '1.0.0',
+    debug: false,
 }
 
 export const BASE_URLS: Record<APIEndpoint, string> = {

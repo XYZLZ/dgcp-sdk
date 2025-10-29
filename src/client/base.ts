@@ -17,7 +17,7 @@ export class BaseClient {
             timeout: config.timeout || 30000,
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': `my-sdk-js/${config.version}`,
+                'User-Agent': `dgcp-sdk-js/${config.version}`,
                 ...config.headers,
             },
             httpsAgent: agent,
@@ -77,7 +77,7 @@ export class BaseClient {
         return response.data
     }
 
-    getEndpoitn(): APIEndpoint {
+    getEndpoint(): APIEndpoint {
         return this.endpoint
     }
 
