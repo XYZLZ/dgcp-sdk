@@ -6,7 +6,7 @@ import https from 'node:https'
 export class BaseClient {
     protected axios: AxiosInstance
     protected config: InternalSDKConfig
-    protected endpoint: APIEndpoint
+    protected endpoint: APIEndpoint 
 
     constructor(config: InternalSDKConfig) {
         const agent = new https.Agent({ rejectUnauthorized: false }) // todo: delete this in the future
