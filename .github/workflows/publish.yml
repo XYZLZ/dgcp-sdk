@@ -9,7 +9,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       id-token: write
 
@@ -31,4 +31,4 @@ jobs:
       run: npm install
 
     - name: Publish package
-      run: npm publish --access restricted
+      run: npm publish --access restricted --no-git-checks
