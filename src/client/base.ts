@@ -1,0 +1,87 @@
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import { RateLimitError, AuthenticationError, NetworkError, APIError } from '#errors/errors.js'
+import { APIEndpoint, type InternalSDKConfig } from '#config/config.js'
+import https from 'node:https'
+
+export class BaseClient {
+    protected axios: AxiosInstance
+    protected config: InternalSDKConfig
+    protected endpoint: APIEndpoint
+
+    constructor(config: InternalSDKConfig) {
+        const agent = new https.Agent({ rejectUnauthorized: false }) // todo: delete this in the future
+        this.config = config
+        this.endpoint = config.endpoint
+        this.axios = axios.create({
+            baseURL: config.baseUrl,
+            timeout: config.timeout || 30000,
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': `my-sdk-js/${config.version}`,
+                ...config.headers,
+            },
+            httpsAgent: agent,
+        })
+
+        this.setupInterceptors()
+    }
+
+    private setupInterceptors(): void {
+        this.axios.interceptors.request.use(
+            (config) => {
+                if (this.config.apiKey) {
+                    config.headers.Authorization = `Bearer ${this.config.apiKey}`
+                }
+
+                if (this.config.debug) {
+                    console.log('[SDK REQUEST]', {
+                        method: config.method,
+                        url: config.url,
+                        headers: config.headers,
+                    })
+                }
+
+                return config
+            },
+            (error) => Promise.reject(error)
+        )
+
+        this.axios.interceptors.response.use(
+            (response) => {
+                if (this.config.debug) {
+                    console.log('[SDK RESPONSE]', {
+                        status: response.status,
+                        url: response.config.url,
+                    })
+                }
+
+                return response
+            },
+
+            (error) => {
+                if (error.response) {
+                    const status = error.response.status
+
+                    if (status === 401) throw AuthenticationError('Invalid API key', error)
+                    if (status === 429) throw RateLimitError('Rate limit exceeded', error)
+
+                    throw APIError(error.response.data.message || 'API request failed', error)
+                }
+                throw NetworkError('Network error', error)
+            }
+        )
+    }
+
+    protected async request<T>(config: AxiosRequestConfig): Promise<T> {
+        const response = await this.axios.request<T>(config)
+        return response.data
+    }
+
+    getEndpoitn(): APIEndpoint {
+        return this.endpoint
+    }
+
+    getBaseUrl(): string {
+        return this.config.baseUrl
+    }
+}
