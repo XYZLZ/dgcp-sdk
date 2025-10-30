@@ -69,7 +69,8 @@ class Mahoraga {
     private config: SDKConfig
 
     constructor(apiKey: string, options?: Partial<Omit<SDKConfig, 'apiKey'>>) {
-        if (!apiKey) throw ApiKeyRequiredError('API key is required', new Error('API key is required'))
+        if (!apiKey || apiKey === '' || typeof apiKey !== 'string')
+            throw ApiKeyRequiredError('API key is required', new Error('API key is required'))
 
         this.config = {
             ...DEFAULT_CONFIG,

@@ -1,11 +1,15 @@
 import { BaseClient } from '#client/base.js'
-import type { InternalSDKConfig } from '#config/config.js'
+import { APIEndpoint, BASE_URLS, type InternalSDKConfig } from '#config/config.js'
 import type { MahoragaResponse } from '#types/mahoraga/api.js'
 import type { App, AppSettings } from '#types/mahoraga/index.js'
 
 export class Apps extends BaseClient {
     constructor(config: InternalSDKConfig) {
-        super(config)
+        super({
+            ...config,
+            endpoint: APIEndpoint.MAHORAGA,
+            baseUrl: BASE_URLS[APIEndpoint.MAHORAGA],
+        })
     }
 
     async list(userId: string): Promise<MahoragaResponse<App[]>> {

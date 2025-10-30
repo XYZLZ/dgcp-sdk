@@ -1,15 +1,15 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import { RateLimitError, AuthenticationError, NetworkError, APIError } from '#errors/errors.js'
 import { APIEndpoint, type InternalSDKConfig } from '#config/config.js'
-import https from 'node:https'
+// import https from 'node:https'
 
 export class BaseClient {
     protected axios: AxiosInstance
     protected config: InternalSDKConfig
-    protected endpoint: APIEndpoint 
+    protected endpoint: APIEndpoint
 
     constructor(config: InternalSDKConfig) {
-        const agent = new https.Agent({ rejectUnauthorized: false }) // todo: delete this in the future
+        // const agent = new https.Agent({ rejectUnauthorized: false }) // todo: delete this in the future
         this.config = config
         this.endpoint = config.endpoint
         this.axios = axios.create({
@@ -20,7 +20,7 @@ export class BaseClient {
                 'User-Agent': `dgcp-sdk-js/${config.version}`,
                 ...config.headers,
             },
-            httpsAgent: agent,
+            // httpsAgent: agent,
         })
 
         this.setupInterceptors()
@@ -36,7 +36,7 @@ export class BaseClient {
                 if (this.config.debug) {
                     console.log('[SDK REQUEST]', {
                         method: config.method,
-                        url: config.url,
+                        url: config.baseURL! + config.url,
                         headers: config.headers,
                     })
                 }
@@ -51,7 +51,7 @@ export class BaseClient {
                 if (this.config.debug) {
                     console.log('[SDK RESPONSE]', {
                         status: response.status,
-                        url: response.config.url,
+                        url: response.config.url + response.config.params ? `?${response.config.params}` : '',
                     })
                 }
 

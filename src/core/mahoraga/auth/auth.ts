@@ -15,7 +15,7 @@ export class Auth extends BaseClient {
     async login(credentials: MahoLogin): Promise<MahoragaResponse<LoginServicePayload>> {
         return await this.request<MahoragaResponse<LoginServicePayload>>({
             method: 'POST',
-            url: '/login',
+            url: '/auth/login',
             data: { username: credentials.username, password: credentials.password },
         })
     }
