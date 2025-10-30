@@ -30,7 +30,7 @@ export class BaseClient {
         this.axios.interceptors.request.use(
             (config) => {
                 if (this.config.apiKey) {
-                    config.headers.Authorization = `Bearer ${this.config.apiKey}`
+                    config.headers['X-API-Key'] = `${this.config.apiKey}`
                 }
 
                 if (this.config.debug) {

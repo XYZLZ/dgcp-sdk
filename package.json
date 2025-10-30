@@ -1,7 +1,7 @@
 {
   "name": "@xyzlz/dgcp-sdk",
   "version": "1.0.0",
-  "description": "FileSystem SDK for DGCP that wraps the mahoraga API",
+  "description": "SDK for DGCP that wraps the DGP apis",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "scripts": {
@@ -42,7 +42,6 @@
     "typescript-eslint": "8.46.2"
   },
   "dependencies": {
-    "@xyzlz/dgcp-sdk": "github:XYZLZ/dgcp-sdk",
     "axios": "1.13.1"
   },
   "imports": {
@@ -54,7 +53,6 @@
     "#core/*": "./src/core/*",
     "#root/*": "./src/*"
   },
-
   "files": [
     "README.md",
     "dist/main.d.ts",

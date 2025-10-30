@@ -4,7 +4,7 @@ export enum APIEndpoint {
 }
 
 export interface SDKConfig {
-    apiKey: string
+    apiKey?: string
     timeout?: number
     retryConfig?: RetryConfig
     headers?: Record<string, string>
@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG: Partial<SDKConfig> = {
 
 export const BASE_URLS: Record<APIEndpoint, string> = {
     [APIEndpoint.API]: 'https://datosabiertos.dgcp.gob.do/api-dgcp/v1/',
-    [APIEndpoint.MAHORAGA]: 'https://api.mahoraga.com/v1/',
+    [APIEndpoint.MAHORAGA]: 'http://172.30.1.157:9090/api/v1/',
 }
 
 export const VERSION = '1.0.0'

@@ -1,4 +1,5 @@
 import { type InternalSDKConfig, type SDKConfig, DEFAULT_CONFIG } from '#config/config.js'
+import { ApiKeyRequiredError } from '#errors/errors.js'
 
 import { ContractsAPIResource } from '#core/api/contracts/contracts.js'
 import { OffersAPIResource } from '#core/api/offers/offers.js'
@@ -7,6 +8,9 @@ import { CatalogAPIResource } from '#core/api/catalog/catalog.js'
 import { PACCResource } from '#core/api/pacc/pacc.js'
 import { PurcharseUnitsAPIResource } from '#core/api/purcharseUnits/purcharseUnits.js'
 import { SuppliersAPIResource } from '#core/api/suppliers/suppliers.js'
+import { Auth } from '#core/mahoraga/auth/auth.js'
+import { Files } from '#core/mahoraga/files/files.js'
+import { Apps } from '#core/mahoraga/apps/apps.js'
 
 type ApiInstances = {
     processes: ProcessesAPIResource
@@ -23,11 +27,10 @@ class DGCP {
 
     private config: SDKConfig
 
-    constructor(apiKey: string, options?: Partial<Omit<SDKConfig, 'apiKey'>>) {
+    constructor(options?: Partial<Omit<SDKConfig, 'apiKey'>>) {
         this.config = {
             ...DEFAULT_CONFIG,
             ...options,
-            apiKey,
         }
 
         // Initialize all resources
@@ -58,10 +61,44 @@ class DGCP {
     }
 }
 
-function dgcp(apikey: string, config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
-    return new DGCP(apikey, config)
+class Mahoraga {
+    public auth: Auth
+    public files: Files
+    public apps: Apps
+
+    private config: SDKConfig
+
+    constructor(apiKey: string, options?: Partial<Omit<SDKConfig, 'apiKey'>>) {
+        if (!apiKey) throw ApiKeyRequiredError('API key is required', new Error('API key is required'))
+
+        this.config = {
+            ...DEFAULT_CONFIG,
+            ...options,
+            apiKey,
+        }
+
+        this.auth = new Auth(this.config as InternalSDKConfig)
+        this.files = new Files(this.config as InternalSDKConfig)
+        this.apps = new Apps(this.config as InternalSDKConfig)
+    }
+
+    updateConfig(config: Partial<Omit<SDKConfig, 'apiKey'>>): void {
+        this.config = { ...this.config, ...config }
+
+        this.auth = new Auth(this.config as InternalSDKConfig)
+        this.files = new Files(this.config as InternalSDKConfig)
+        this.apps = new Apps(this.config as InternalSDKConfig)
+    }
+}
+
+export function dgcp(config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
+    return new DGCP(config)
+}
+
+export function mahoraga(apiKey: string, config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
+    return new Mahoraga(apiKey, config)
 }
 
 export * from './types/api/api.js'
 export * from './errors/errors.js'
-export { dgcp }
+export * from './types/mahoraga/api.js'

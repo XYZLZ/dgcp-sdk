@@ -1,4 +1,4 @@
-export interface ApiResponse<T> {
+export interface MahoragaResponse<T> {
     code: number
     hasError: boolean
     payload: {
@@ -7,12 +7,9 @@ export interface ApiResponse<T> {
         errors?: string[]
     }
 }
-
-export interface PaginatedResponse<T> extends ApiResponse<T> {
+export interface MahoragaPaginatedResponse<T> extends MahoragaResponse<T> {
     page: number
     limit: number
     totalResults: number
     pages: number
 }
-
-export type APIDate = `${number}-${number}-${number}`;

@@ -69,3 +69,7 @@ export function UnprocessableEntityError(message: string, cause: Error) {
 export function InternalServerError(message: string, cause: Error) {
     return new SDKError(INTERNAL_SERVER_ERROR, 'Internal server error', 500, { message, cause: cause.message })
 }
+
+export function ApiKeyRequiredError(message: string, cause: Error) {
+    return new SDKError(AUTHENTICATION_ERROR, 'API key is required', 401, { message, cause: cause.message })
+}

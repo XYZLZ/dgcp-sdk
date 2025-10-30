@@ -1,4 +1,5 @@
-import type { APIDate, PaginationRequest } from '#types/api/api.js'
+import type { APIDate } from '#types/api/api.js'
+import type { PaginationRequest } from '../shared.js'
 
 export interface ApiResponse<T> {
     code: number

@@ -5,7 +5,7 @@ declare enum APIEndpoint {
     MAHORAGA = "mahoraga"
 }
 interface SDKConfig {
-    apiKey: string;
+    apiKey?: string;
     timeout?: number;
     retryConfig?: RetryConfig;
     headers?: Record<string, string>;
@@ -42,10 +42,6 @@ interface ApiResponse<T> {
         errors?: string[];
     };
 }
-interface PaginationRequest {
-    page?: number;
-    limit?: number;
-}
 interface PaginatedResponse<T> extends ApiResponse<T> {
     page: number;
     limit: number;
@@ -53,6 +49,11 @@ interface PaginatedResponse<T> extends ApiResponse<T> {
     pages: number;
 }
 type APIDate = `${number}-${number}-${number}`;
+
+interface PaginationRequest {
+    page?: number;
+    limit?: number;
+}
 
 interface Procesos {
     codigo_proceso: string;
@@ -550,6 +551,85 @@ declare class SuppliersAPIResource extends BaseClient {
     rubro(params: GetRubroProveedor): Promise<PaginatedResponse<RubroProveedor[]>>;
 }
 
+interface MahoragaResponse<T> {
+    code: number;
+    hasError: boolean;
+    payload: {
+        content: T;
+        message: string;
+        errors?: string[];
+    };
+}
+interface MahoragaPaginatedResponse<T> extends MahoragaResponse<T> {
+    page: number;
+    limit: number;
+    totalResults: number;
+    pages: number;
+}
+
+interface MahoFileInfo {
+    file_id: string;
+    download_url: string;
+    file_name: string;
+    file_type: string;
+    file_size: number;
+    created_at: Date;
+}
+interface MahoUser {
+    id: string;
+    username?: string;
+}
+interface MahoLogin {
+    username: string;
+    password: string;
+}
+interface LoginServicePayload {
+    user: MahoUser;
+    accessToken: string;
+    refreshToken: string;
+}
+interface App {
+    id: string;
+    name?: string;
+    description?: string;
+    tenant_id?: string;
+    created_at?: Date;
+    updated_at?: Date;
+}
+interface AppSettings {
+    id?: number;
+    app_id?: string;
+    max_storage_mb?: number;
+    used_storage_mb?: number;
+    max_file_size_mb?: number;
+    state?: string;
+    created_at?: Date;
+    updated_at?: Date;
+}
+
+declare class Auth extends BaseClient {
+    constructor(config: InternalSDKConfig);
+    login(credentials: MahoLogin): Promise<MahoragaResponse<LoginServicePayload>>;
+}
+
+declare class Files extends BaseClient {
+    constructor(config: InternalSDKConfig);
+    list(params: PaginationRequest): Promise<MahoragaPaginatedResponse<MahoFileInfo[]>>;
+    upload(files: File[]): Promise<MahoragaResponse<MahoFileInfo>>;
+    delete(fileId: string): Promise<MahoragaResponse<string>>;
+    download(fileId: string): Promise<Blob>;
+}
+
+declare class Apps extends BaseClient {
+    constructor(config: InternalSDKConfig);
+    list(userId: string): Promise<MahoragaResponse<App[]>>;
+    create(app: Omit<App, 'id' | 'created_at' | 'updated_at'>): Promise<MahoragaResponse<App>>;
+    update(app: App): Promise<MahoragaResponse<App>>;
+    getSettings(appId: string): Promise<MahoragaResponse<AppSettings>>;
+    createSettings(settings: Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>): Promise<MahoragaResponse<AppSettings>>;
+    updateSettings(settings: AppSettings): Promise<MahoragaResponse<AppSettings>>;
+}
+
 declare class SDKError extends Error {
     message: string;
     code: string;
@@ -575,6 +655,7 @@ declare function NotFoundError(message: string, cause: Error): SDKError;
 declare function ConflictError(message: string, cause: Error): SDKError;
 declare function UnprocessableEntityError(message: string, cause: Error): SDKError;
 declare function InternalServerError(message: string, cause: Error): SDKError;
+declare function ApiKeyRequiredError(message: string, cause: Error): SDKError;
 
 type ApiInstances = {
     processes: ProcessesAPIResource;
@@ -588,9 +669,18 @@ type ApiInstances = {
 declare class DGCP {
     api: ApiInstances;
     private config;
+    constructor(options?: Partial<Omit<SDKConfig, 'apiKey'>>);
+    updateConfig(config: Partial<Omit<SDKConfig, 'apiKey'>>): void;
+}
+declare class Mahoraga {
+    auth: Auth;
+    files: Files;
+    apps: Apps;
+    private config;
     constructor(apiKey: string, options?: Partial<Omit<SDKConfig, 'apiKey'>>);
     updateConfig(config: Partial<Omit<SDKConfig, 'apiKey'>>): void;
 }
-declare function dgcp(apikey: string, config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>): DGCP;
+declare function dgcp(config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>): DGCP;
+declare function mahoraga(apiKey: string, config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>): Mahoraga;
 
-export { type APIDate, APIError, API_ERROR, AUTHENTICATION_ERROR, type ApiResponse, AuthenticationError, CONFLICT_ERROR, ConflictError, INTERNAL_SERVER_ERROR, InternalServerError, NETWORK_ERROR, NOT_FOUND_ERROR, NetworkError, NotFoundError, type PaginatedResponse, type PaginationRequest, RATE_LIMIT_ERROR, RateLimitError, SDKError, UNPROCESSABLE_ENTITY_ERROR, UnprocessableEntityError, VALIDATION_ERROR, ValidationError, dgcp };
+export { type APIDate, APIError, API_ERROR, AUTHENTICATION_ERROR, ApiKeyRequiredError, type ApiResponse, AuthenticationError, CONFLICT_ERROR, ConflictError, INTERNAL_SERVER_ERROR, InternalServerError, type MahoragaPaginatedResponse, type MahoragaResponse, NETWORK_ERROR, NOT_FOUND_ERROR, NetworkError, NotFoundError, type PaginatedResponse, RATE_LIMIT_ERROR, RateLimitError, SDKError, UNPROCESSABLE_ENTITY_ERROR, UnprocessableEntityError, VALIDATION_ERROR, ValidationError, dgcp, mahoraga };
