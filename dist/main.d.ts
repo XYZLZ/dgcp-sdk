@@ -656,11 +656,47 @@ declare class Files extends BaseClient {
 
 declare class Apps extends BaseClient {
     constructor(config: InternalSDKConfig);
+    /**
+     * Retrieves a list of apps for a given user.
+     * @param {string} userId - The id of the user.
+     * @returns {Promise<MahoragaResponse<App[]>>} - A promise with the list of apps.
+     * @example const response = await api.apps.list('1234567890abcdef')
+     */
     list(userId: string): Promise<MahoragaResponse<App[]>>;
+    /**
+     * Creates a new app.
+     * @param {Omit<App, 'id' | 'created_at' | 'updated_at'>} app - The app to be created.
+     * @returns {Promise<MahoragaResponse<App>>} - A promise with the created app.
+     * @example const response = await api.apps.create({ name: 'My App', description: 'This is my app' })
+     */
     create(app: Omit<App, 'id' | 'created_at' | 'updated_at'>): Promise<MahoragaResponse<App>>;
+    /**
+     * Updates an existing app.
+     * @param {App} app - The app to be updated.
+     * @returns {Promise<MahoragaResponse<App>>} - A promise with the updated app.
+     * @example const response = await api.apps.update({ id: '1234567890abcdef', name: 'My Updated App' })
+     */
     update(app: App): Promise<MahoragaResponse<App>>;
+    /**
+     * Retrieves the settings for an app.
+     * @param {string} appId - The id of the app.
+     * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the app settings.
+     * @example const response = await api.apps.getSettings('1234567890abcdef')
+     */
     getSettings(appId: string): Promise<MahoragaResponse<AppSettings>>;
+    /**
+     * Creates new settings for an app.
+     * @param {Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>} settings - The settings to be created.
+     * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the created settings.
+     * @example const response = await api.apps.createSettings({ app_id: '1234567890abcdef', max_storage_mb: 1000 })
+     */
     createSettings(settings: Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>): Promise<MahoragaResponse<AppSettings>>;
+    /**
+     * Updates the settings for an app.
+     * @param {AppSettings} settings - The settings to be updated.
+     * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the updated settings.
+     * @example const response = await api.apps.updateSettings({ id: '1234567890abcdef', max_storage_mb: 2000 })
+     */
     updateSettings(settings: AppSettings): Promise<MahoragaResponse<AppSettings>>;
 }
 
