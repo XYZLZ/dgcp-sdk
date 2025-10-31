@@ -1,6 +1,6 @@
 {
   "name": "@xyzlz/dgcp-sdk",
-  "version": "1.0.0-beta",
+  "version": "1.0.1",
   "description": "SDK for DGCP that wraps the DGP apis",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
@@ -8,8 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
     "lint": "eslint src --ext .ts",
-    "dev": "tsx src/main.ts",
-    "publish": "npm publish --access restricted"
+    "dev": "tsx src/main.ts"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@xyzlz"

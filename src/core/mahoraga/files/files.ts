@@ -61,7 +61,7 @@ export class Files extends BaseClient {
 
         const formData = new NodeFormData()
 
-        files.forEach((file, index) => {
+        files.forEach(file => {
             if (file.file instanceof Buffer) {
                 formData.append('files', file.file, { filename: file.name })
             } else if (file.file instanceof ReadStream) {
