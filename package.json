@@ -1,6 +1,6 @@
 {
   "name": "@xyzlz/dgcp-sdk",
-  "version": "1.0.0",
+  "version": "1.0.0-beta",
   "description": "SDK for DGCP that wraps the DGP apis",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
