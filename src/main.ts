@@ -92,6 +92,7 @@ class Mahoraga {
     }
 }
 
+
 export function dgcp(config?: Omit<SDKConfig, 'apiKey' | 'baseUrl'>) {
     return new DGCP(config)
 }
