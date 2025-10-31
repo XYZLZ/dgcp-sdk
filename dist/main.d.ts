@@ -1,4 +1,5 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { ReadStream } from 'node:fs';
 
 declare enum APIEndpoint {
     API = "api",
@@ -612,11 +613,44 @@ declare class Auth extends BaseClient {
     login(credentials: MahoLogin): Promise<MahoragaResponse<LoginServicePayload>>;
 }
 
+type MahoFile = {
+    file: ReadStream | Buffer | ArrayBuffer;
+    name: string;
+};
 declare class Files extends BaseClient {
     constructor(config: InternalSDKConfig);
-    list(params: PaginationRequest): Promise<MahoragaPaginatedResponse<MahoFileInfo[]>>;
-    upload(files: File[]): Promise<MahoragaResponse<MahoFileInfo>>;
+    /**
+     * Get a list of all files.
+     * @param {PaginationRequest} [params] - Parameters to filter the files.
+     * @returns {Promise<MahoragaPaginatedResponse<MahoFileInfo[] | null>>} - A promise with the list of files.
+     * @example const files = await api.files.list()
+     * @example const files = await api.files.list({ page: 1, limit: 10 })
+     */
+    list(params: PaginationRequest): Promise<MahoragaPaginatedResponse<MahoFileInfo[] | null>>;
+    /**
+     * Upload files to the Mahoraga storage.
+     * @param {MahoFile[]} files - List of files to be uploaded.
+     * @returns {Promise<MahoragaResponse<MahoFileInfo>>} - A promise with the list of uploaded files.
+     * @throws ValidationError - If no files are provided or if any of the files have invalid types.
+     * @throws SDKError - If any of the files have invalid types.
+     * @example const files = await api.files.upload([{ file: new ReadStream('file.txt'), name: 'file.txt' }])
+     */
+    upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo>>;
+    /**
+     * Deletes a file from Mahoraga.
+     * @param {string} fileId - The id of the file to be deleted.
+     * @returns {Promise<MahoragaResponse<string>>} - A promise with the response from the server.
+     * @throws SDKError - If the file does not exist or if any error occurs during the deletion process.
+     * @example const response = await api.files.delete('1234567890abcdef')
+     */
     delete(fileId: string): Promise<MahoragaResponse<string>>;
+    /**
+     * Downloads a file from Mahoraga.
+     * @param {string} fileId - The id of the file to be downloaded.
+     * @returns {Promise<Blob>} - A promise with the blob of the downloaded file.
+     * @throws SDKError - If the file does not exist or if any error occurs during the download process.
+     * @example const blob = await api.files.download('1234567890abcdef')
+     */
     download(fileId: string): Promise<Blob>;
 }
 

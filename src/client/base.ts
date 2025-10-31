@@ -59,6 +59,7 @@ export class BaseClient {
             },
 
             (error) => {
+                console.log(error)
                 if (error.response) {
                     const status = error.response.status
 
