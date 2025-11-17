@@ -105,12 +105,18 @@ export class Files extends BaseClient {
      * @throws SDKError - If the file does not exist or if any error occurs during the download process.
      * @example const blob = await api.files.download('1234567890abcdef')
      */
-    async download(fileId: string): Promise<Blob> {
-        return await this.request<Blob>({
+    async download(fileId: string): Promise<Buffer> {
+        const res = await this.request<Buffer>({
             method: 'get',
             url: '/files/download',
             params: { id: fileId },
-            responseType: 'blob',
+            responseType: 'arraybuffer'
         })
+
+        if (res instanceof ArrayBuffer) {
+            return Buffer.from(res)
+        }
+
+        return res
     }
 }
