@@ -50,7 +50,7 @@ export class Files extends BaseClient {
      * @throws SDKError - If any of the files have invalid types.
      * @example const files = await api.files.upload([{ file: new ReadStream('file.txt'), name: 'file.txt' }])
      */
-    async upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo>> {
+    async upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo[]>> {
         if (!files || !Array.isArray(files) || files.length === 0)
             throw ValidationError('No files provided', new Error('No files provided'))
 
@@ -76,7 +76,7 @@ export class Files extends BaseClient {
             }
         })
 
-        return await this.request<MahoragaResponse<MahoFileInfo>>({
+        return await this.request<MahoragaResponse<MahoFileInfo[]>>({
             method: 'post',
             url: '/files/upload',
             data: formData,

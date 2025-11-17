@@ -651,7 +651,7 @@ declare class Files extends BaseClient {
      * @throws SDKError - If the file does not exist or if any error occurs during the download process.
      * @example const blob = await api.files.download('1234567890abcdef')
      */
-    download(fileId: string): Promise<Blob>;
+    download(fileId: string): Promise<Buffer>;
 }
 
 declare class Apps extends BaseClient {
