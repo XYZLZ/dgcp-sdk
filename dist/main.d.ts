@@ -635,7 +635,7 @@ declare class Files extends BaseClient {
      * @throws SDKError - If any of the files have invalid types.
      * @example const files = await api.files.upload([{ file: new ReadStream('file.txt'), name: 'file.txt' }])
      */
-    upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo>>;
+    upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo[]>>;
     /**
      * Deletes a file from Mahoraga.
      * @param {string} fileId - The id of the file to be deleted.
