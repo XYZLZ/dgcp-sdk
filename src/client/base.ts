@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { RateLimitError, AuthenticationError, NetworkError, APIError } from '#errors/errors.js'
 import { APIEndpoint, type InternalSDKConfig } from '#config/config.js'
 import https from 'node:https'
@@ -43,7 +43,7 @@ export class BaseClient {
 
                 return config
             },
-            (error) => Promise.reject(error)
+            (error) => Promise.reject(error),
         )
 
         this.axios.interceptors.response.use(
@@ -69,12 +69,16 @@ export class BaseClient {
                     throw APIError(error.response.data.message || 'API request failed', error)
                 }
                 throw NetworkError('Network error', error)
-            }
+            },
         )
     }
 
-    protected async request<T>(config: AxiosRequestConfig): Promise<T> {
+    protected async request<T>(
+        config: AxiosRequestConfig,
+        setRequestInfo: boolean,
+    ): Promise<AxiosResponse<T> | T> {
         const response = await this.axios.request<T>(config)
+        if (setRequestInfo) return response
         return response.data
     }
 

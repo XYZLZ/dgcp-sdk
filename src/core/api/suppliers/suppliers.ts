@@ -8,6 +8,7 @@ import type {
     RubroProveedor,
     TransparenciaMipymesMujeres,
 } from '#types/api/index.js'
+import type { AxiosResponse } from 'axios'
 
 export class SuppliersAPIResource extends BaseClient {
     constructor(config: InternalSDKConfig) {
@@ -21,18 +22,27 @@ export class SuppliersAPIResource extends BaseClient {
     /**
      * Get a list of all suppliers.
      * @param {GetProveedores} [params] - Parameters to filter the suppliers.
-     * @returns {Promise<PaginatedResponse<Proveedor[]>>} - A promise with the list of suppliers.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Proveedor[]>> | PaginatedResponse<Proveedor[]>>} - A promise with the list of suppliers.
      * @example const suppliers = await api.suppliers.list()
      * @example const suppliers = await api.suppliers.list({ rpe: 123 })
      */
-    async list(params?: GetProveedores): Promise<PaginatedResponse<Proveedor[]>> {
-        const res = await this.request<PaginatedResponse<Proveedor[]>>({
-            method: 'GET',
-            url: '/suppliers',
-            params,
-        })
+    async list(
+        params?: GetProveedores,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<PaginatedResponse<Proveedor[]>> | PaginatedResponse<Proveedor[]>> {
+        const res = await this.request<PaginatedResponse<Proveedor[]>>(
+            {
+                method: 'GET',
+                url: '/suppliers',
+                params,
+            },
+            withResponseMetadata,
+        )
 
-        res.payload.content.forEach((p) => {
+        if (withResponseMetadata) return res as AxiosResponse<PaginatedResponse<Proveedor[]>>
+
+        const data = res as PaginatedResponse<Proveedor[]>
+        data.payload.content.forEach((p) => {
             if (p.fecha_creacion_empresa) p.fecha_creacion_empresa = new Date(p.fecha_creacion_empresa)
             if (p.fecha_registro_mercantil) p.fecha_registro_mercantil = new Date(p.fecha_registro_mercantil)
             if (p.fecha_registro_rpe) p.fecha_registro_rpe = new Date(p.fecha_registro_rpe)
@@ -40,19 +50,24 @@ export class SuppliersAPIResource extends BaseClient {
                 p.fecha_vencimiento_certificacion_micm = new Date(p.fecha_vencimiento_certificacion_micm)
             return p
         })
-        return res
+        return data
     }
 
     /**
      * Get a statistic about women in suppliers.
-     * @returns {Promise<TransparenciaMipymesMujeres>} - A promise with the statistic.
+     * @returns {Promise<AxiosResponse<TransparenciaMipymesMujeres> | TransparenciaMipymesMujeres>} - A promise with the statistic.
      * @example const statistic = await api.suppliers.womenStatistic()
      */
-    async womenStatistic(): Promise<TransparenciaMipymesMujeres> {
-        return await this.request<TransparenciaMipymesMujeres>({
-            method: 'GET',
-            url: '/suppliers/women-statistic',
-        })
+    async womenStatistic(
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<TransparenciaMipymesMujeres> | TransparenciaMipymesMujeres> {
+        return await this.request<TransparenciaMipymesMujeres>(
+            {
+                method: 'GET',
+                url: '/suppliers/women-statistic',
+            },
+            withResponseMetadata,
+        )
     }
 
     /**
@@ -62,11 +77,17 @@ export class SuppliersAPIResource extends BaseClient {
      * @example const rubro = await api.suppliers.rubro()
      * @example const rubro = await api.suppliers.rubro({ rpe: 123 })
      */
-    async rubro(params: GetRubroProveedor): Promise<PaginatedResponse<RubroProveedor[]>> {
-        return await this.request<PaginatedResponse<RubroProveedor[]>>({
-            method: 'GET',
-            url: '/suppliers/rubro',
-            params,
-        })
+    async rubro(
+        params: GetRubroProveedor,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<PaginatedResponse<RubroProveedor[]>> | PaginatedResponse<RubroProveedor[]>> {
+        return await this.request<PaginatedResponse<RubroProveedor[]>>(
+            {
+                method: 'GET',
+                url: '/suppliers/rubro',
+                params,
+            },
+            withResponseMetadata,
+        )
     }
 }

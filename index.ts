@@ -1,7 +1,7 @@
-import { dgcp } from '@xyzlz/dgcp-sdk'
+import { dgcp } from './dist/main'
 
 const sdk = dgcp()
 
-const res = await sdk.api.processes.list()
+const res = await sdk.api.processes.list({}, true)
 
-console.log(res)
+console.log({result: res})

@@ -1,6 +1,7 @@
 import { BaseClient } from '#client/base.js'
 import { APIEndpoint, BASE_URLS, type InternalSDKConfig } from '#config/config.js'
 import type { PaginatedResponse } from '#types/api/api.js'
+import type { AxiosResponse } from 'axios'
 import type {
     ArticulosMipymes,
     ArticulosProcesos,
@@ -14,9 +15,15 @@ import type {
 
 export class ProcessesAPIResource extends BaseClient {
     public mipymes: {
-        articles: () => Promise<ArticulosMipymes[]>
-        globalQuota: (year?: number) => Promise<CuotaMipymesGlobal[]>
-        purcharseUnitQuota: ({ unitCode, year }: { unitCode?: number; year?: number }) => Promise<CuotaMipymes[]>
+        articles: (withResponseMetadata?: boolean) => Promise<AxiosResponse<ArticulosMipymes[]> | ArticulosMipymes[]>
+        globalQuota: (
+            year?: number,
+            withResponseMetadata?: boolean,
+        ) => Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]>
+        purcharseUnitQuota: (
+            { unitCode, year }: { unitCode?: number; year?: number },
+            withResponseMetadata?: boolean,
+        ) => Promise<AxiosResponse<CuotaMipymes[]> | CuotaMipymes[]>
     }
     constructor(config: InternalSDKConfig) {
         super({
@@ -35,13 +42,22 @@ export class ProcessesAPIResource extends BaseClient {
     /**
      * Get a list of all processes.
      * @param {GetProcesos} [params] - Query parameters.
-     * @returns {Promise<PaginatedResponse<Procesos[]>>} - A promise with the list of processes.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Procesos[]>> | PaginatedResponse<Procesos[]>>} - A promise with the list of processes.
      * @example const processes = await api.processes.list()
      * @example const processes = await api.processes.list({ unidad_compra: 123 })
      */
-    public async list(params?: GetProcesos): Promise<PaginatedResponse<Procesos[]>> {
-        const res = await this.request<PaginatedResponse<Procesos[]>>({ method: 'GET', url: '/procesos', params })
-        res.payload.content.forEach((p) => {
+    public async list(
+        params?: GetProcesos,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<PaginatedResponse<Procesos[]>> | PaginatedResponse<Procesos[]>> {
+        const res = await this.request<PaginatedResponse<Procesos[]>>(
+            { method: 'GET', url: '/procesos', params },
+            withResponseMetadata,
+        )
+
+        if (withResponseMetadata) return res as AxiosResponse<PaginatedResponse<Procesos[]>>
+
+        ;(res as PaginatedResponse<Procesos[]>).payload.content.forEach((p) => {
             p.fecha_apertura_ofertas = new Date(p.fecha_apertura_ofertas)
             p.fecha_apertura_ofertas2 = new Date(p.fecha_apertura_ofertas2)
             p.fecha_enmienda = new Date(p.fecha_enmienda)
@@ -52,6 +68,7 @@ export class ProcessesAPIResource extends BaseClient {
             p.fecha_suscripcion = new Date(p.fecha_suscripcion)
             return p
         })
+
         return res
     }
 
@@ -61,76 +78,107 @@ export class ProcessesAPIResource extends BaseClient {
      * @returns {Promise<Procesos>} - A promise with the grouped list of processes.
      * @example const processes = await api.processes.group(123)
      */
-    public async group(unitCode: number): Promise<Procesos> {
-        const res = await this.request<Procesos>({
-            method: 'GET',
-            url: `/procesos/agrupados`,
-            params: { unidad_compra: unitCode },
-        })
+    public async group(unitCode: number, withResponseMetadata = false): Promise<AxiosResponse<Procesos> | Procesos> {
+        const res = await this.request<Procesos>(
+            {
+                method: 'GET',
+                url: `/procesos/agrupados`,
+                params: { unidad_compra: unitCode },
+            },
+            withResponseMetadata,
+        )
 
-        res.fecha_apertura_ofertas = new Date(res.fecha_apertura_ofertas)
-        res.fecha_apertura_ofertas2 = new Date(res.fecha_apertura_ofertas2)
-        res.fecha_enmienda = new Date(res.fecha_enmienda)
-        res.fecha_habilitacion_oferente = new Date(res.fecha_habilitacion_oferente)
-        res.fecha_estimada_adjudicacion = new Date(res.fecha_estimada_adjudicacion)
-        res.fecha_fin_recepcion_ofertas = new Date(res.fecha_fin_recepcion_ofertas)
-        res.fecha_publicacion = new Date(res.fecha_publicacion)
-        res.fecha_suscripcion = new Date(res.fecha_suscripcion)
-        return res
+        if (withResponseMetadata) return res as AxiosResponse<Procesos>
+
+        const data = res as Procesos
+        data.fecha_apertura_ofertas = new Date(data.fecha_apertura_ofertas)
+        data.fecha_apertura_ofertas2 = new Date(data.fecha_apertura_ofertas2)
+        data.fecha_enmienda = new Date(data.fecha_enmienda)
+        data.fecha_habilitacion_oferente = new Date(data.fecha_habilitacion_oferente)
+        data.fecha_estimada_adjudicacion = new Date(data.fecha_estimada_adjudicacion)
+        data.fecha_fin_recepcion_ofertas = new Date(data.fecha_fin_recepcion_ofertas)
+        data.fecha_publicacion = new Date(data.fecha_publicacion)
+        data.fecha_suscripcion = new Date(data.fecha_suscripcion)
+        return data
     }
 
     /**
      * Get a list of articles related to a process.
      * @param {GetArticulosProcesos} params - Parameters to filter the articles.
-     * @returns {Promise<PaginatedResponse<ArticulosProcesos[]>>} - A promise with the list of articles.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<ArticulosProcesos[]>> | PaginatedResponse<ArticulosProcesos[]>>} - A promise with the list of articles.
      * @example const articles = await api.processes.articles({ proceso: 123})
      */
-    public async articles(params?: GetArticulosProcesos): Promise<PaginatedResponse<ArticulosProcesos[]>> {
-        const res = await this.request<PaginatedResponse<ArticulosProcesos[]>>({
-            method: 'GET',
-            url: '/procesos/articulos',
-            params,
-        })
+    public async articles(
+        params?: GetArticulosProcesos,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<PaginatedResponse<ArticulosProcesos[]>> | PaginatedResponse<ArticulosProcesos[]>> {
+        const res = await this.request<PaginatedResponse<ArticulosProcesos[]>>(
+            {
+                method: 'GET',
+                url: '/procesos/articulos',
+                params,
+            },
+            withResponseMetadata,
+        )
 
-        res.payload.content.forEach((a) => {
+        if (withResponseMetadata) return res as AxiosResponse<PaginatedResponse<ArticulosProcesos[]>>
+
+        const data = res as PaginatedResponse<ArticulosProcesos[]>
+        data.payload.content.forEach((a) => {
             a.fecha_publicacion = new Date(a.fecha_publicacion)
         })
-        return res
+        return data
     }
 
     /**
      * Get a list of documents related to a process.
      * @param {string} processCode - Process code.
-     * @returns {Promise<DocumentosProcesos[]>} - A promise with the list of documents.
+     * @returns {Promise<AxiosResponse<DocumentosProcesos[]> | DocumentosProcesos[]>} - A promise with the list of documents.
      * @example const documents = await api.processes.documents('123')
      */
-    public async documents(processCode: string): Promise<DocumentosProcesos[]> {
-        return await this.request<DocumentosProcesos[]>({
-            method: 'GET',
-            url: `/procesos/documentos`,
-            params: { proceso: processCode },
-        })
+    public async documents(
+        processCode: string,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<DocumentosProcesos[]> | DocumentosProcesos[]> {
+        return await this.request<DocumentosProcesos[]>(
+            {
+                method: 'GET',
+                url: `/procesos/documentos`,
+                params: { proceso: processCode },
+            },
+            withResponseMetadata,
+        )
     }
 
     /**
      * Get a list of global quotas for a given year.
      * If year is not provided, it will return the list for the current year.
      * @param {number} year - Year to get the global quotas for.
-     * @returns {Promise<CuotaMipymesGlobal[]>} - A promise with the list of global quotas.
+     * @returns {Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]>} - A promise with the list of global quotas.
      * @example const globalQuotas = await api.processes.globalQuota(2022)
      */
-    public async globalQuota(year?: number): Promise<CuotaMipymesGlobal[]> {
+    public async globalQuota(
+        year?: number,
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]> {
         if (year) {
-            return await this.request<CuotaMipymesGlobal[]>({
-                method: 'GET',
-                url: `/procesos/mipymes/cuota_global`,
-                params: { anio: year },
-            })
+            return await this.request<CuotaMipymesGlobal[]>(
+                {
+                    method: 'GET',
+                    url: `/procesos/mipymes/cuota_global`,
+                    params: { anio: year },
+                },
+                withResponseMetadata,
+            )
         }
-        return await this.request<CuotaMipymesGlobal[]>({
-            method: 'GET',
-            url: '/procesos/mipymes/cuota_global',
-        })
+
+        return await this.request<CuotaMipymesGlobal[]>(
+            {
+                method: 'GET',
+                url: '/procesos/mipymes/cuota_global',
+            },
+            withResponseMetadata,
+        )
     }
 
     /**
@@ -142,12 +190,18 @@ export class ProcessesAPIResource extends BaseClient {
      * @returns {Promise<CuotaMipymes[]>} - A promise with the list of unit quotas.
      * @example const unitQuotas = await api.processes.purcharseUnitQuota({ unitCode: 123, year: 2022 })
      */
-    public async purcharseUnitQuota({ unitCode, year }: { unitCode?: number; year?: number }): Promise<CuotaMipymes[]> {
-        return await this.request<CuotaMipymes[]>({
-            method: 'GET',
-            url: `/procesos/cuota_unidad_compra`,
-            params: { unidad_compra: unitCode, año: year },
-        })
+    public async purcharseUnitQuota(
+        { unitCode, year }: { unitCode?: number; year?: number },
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<CuotaMipymes[]> | CuotaMipymes[]> {
+        return await this.request<CuotaMipymes[]>(
+            {
+                method: 'GET',
+                url: `/procesos/cuota_unidad_compra`,
+                params: { unidad_compra: unitCode, año: year },
+            },
+            withResponseMetadata,
+        )
     }
 
     /**
@@ -155,10 +209,15 @@ export class ProcessesAPIResource extends BaseClient {
      * @returns {Promise<ArticulosMipymes[]>} - A promise with the list of articles.
      * @example const articles = await api.processes.mipymesArticles()
      */
-    public async mipymesArticles(): Promise<ArticulosMipymes[]> {
-        return await this.request<ArticulosMipymes[]>({
-            method: 'GET',
-            url: `/procesos/mipymes/articulos`,
-        })
+    public async mipymesArticles(
+        withResponseMetadata = false,
+    ): Promise<AxiosResponse<ArticulosMipymes[]> | ArticulosMipymes[]> {
+        return await this.request<ArticulosMipymes[]>(
+            {
+                method: 'GET',
+                url: `/procesos/mipymes/articulos`,
+            },
+            withResponseMetadata,
+        )
     }
 }

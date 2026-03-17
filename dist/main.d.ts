@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ReadStream } from 'node:fs';
 
 declare enum APIEndpoint {
@@ -29,7 +29,7 @@ declare class BaseClient {
     protected endpoint: APIEndpoint;
     constructor(config: InternalSDKConfig);
     private setupInterceptors;
-    protected request<T>(config: AxiosRequestConfig): Promise<T>;
+    protected request<T>(config: AxiosRequestConfig, setRequestInfo: boolean): Promise<AxiosResponse<T> | T>;
     getEndpoint(): APIEndpoint;
     getBaseUrl(): string;
 }
@@ -382,11 +382,11 @@ declare class ContractsAPIResource extends BaseClient {
     /**
      * Get a list of contracts.
      * @param {GetContratos} [params] - Parameters to filter the contracts.
-     * @returns {Promise<PaginatedResponse<Contratos[]>>} - A promise with the list of contracts.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Contratos[]>> | PaginatedResponse<Contratos[]>>} - A promise with the list of contracts.
      * @example const contracts = await api.contracts.list()
      * @example const contracts = await api.contracts.list({ unidad_compra: 123 })
      */
-    list(params?: GetContratos): Promise<PaginatedResponse<Contratos[]>>;
+    list(params?: GetContratos, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Contratos[]>> | PaginatedResponse<Contratos[]>>;
     /**
      * Get a list of articles related to a contract.
      * @param {GetArticulosContratos} [params] - Parameters to filter the articles.
@@ -394,7 +394,7 @@ declare class ContractsAPIResource extends BaseClient {
      * @example const articles = await api.contracts.articles()
      * @example const articles = await api.contracts.articles({ contrato: 123 })
      */
-    articles(params?: GetArticulosContratos): Promise<PaginatedResponse<ArticulosContratos[]>>;
+    articles(params?: GetArticulosContratos, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<ArticulosContratos[]>> | PaginatedResponse<ArticulosContratos[]>>;
 }
 
 declare class OffersAPIResource extends BaseClient {
@@ -402,60 +402,60 @@ declare class OffersAPIResource extends BaseClient {
     /**
      * Get a list of all offers.
      * @param {GetOfertas} [params] - Parameters to filter the offers.
-     * @returns {Promise<PaginatedResponse<Ofertas[]>>} - A promise with the list of offers.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Ofertas[]>> | PaginatedResponse<Ofertas[]>>} - A promise with the list of offers.
      * @example const offers = await api.offers.list()
      * @example const offers = await api.offers.list({ proceso: 123 })
      */
-    list(params?: GetOfertas): Promise<PaginatedResponse<Ofertas[]>>;
+    list(params?: GetOfertas, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Ofertas[]>> | PaginatedResponse<Ofertas[]>>;
 }
 
 declare class ProcessesAPIResource extends BaseClient {
     mipymes: {
-        articles: () => Promise<ArticulosMipymes[]>;
-        globalQuota: (year?: number) => Promise<CuotaMipymesGlobal[]>;
+        articles: (withResponseMetadata?: boolean) => Promise<AxiosResponse<ArticulosMipymes[]> | ArticulosMipymes[]>;
+        globalQuota: (year?: number, withResponseMetadata?: boolean) => Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]>;
         purcharseUnitQuota: ({ unitCode, year }: {
             unitCode?: number;
             year?: number;
-        }) => Promise<CuotaMipymes[]>;
+        }, withResponseMetadata?: boolean) => Promise<AxiosResponse<CuotaMipymes[]> | CuotaMipymes[]>;
     };
     constructor(config: InternalSDKConfig);
     /**
      * Get a list of all processes.
      * @param {GetProcesos} [params] - Query parameters.
-     * @returns {Promise<PaginatedResponse<Procesos[]>>} - A promise with the list of processes.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Procesos[]>> | PaginatedResponse<Procesos[]>>} - A promise with the list of processes.
      * @example const processes = await api.processes.list()
      * @example const processes = await api.processes.list({ unidad_compra: 123 })
      */
-    list(params?: GetProcesos): Promise<PaginatedResponse<Procesos[]>>;
+    list(params?: GetProcesos, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Procesos[]>> | PaginatedResponse<Procesos[]>>;
     /**
      * Get a grouped list of processes by unit code.
      * @param {number} unitCode - Unit code.
      * @returns {Promise<Procesos>} - A promise with the grouped list of processes.
      * @example const processes = await api.processes.group(123)
      */
-    group(unitCode: number): Promise<Procesos>;
+    group(unitCode: number, withResponseMetadata?: boolean): Promise<AxiosResponse<Procesos> | Procesos>;
     /**
      * Get a list of articles related to a process.
      * @param {GetArticulosProcesos} params - Parameters to filter the articles.
-     * @returns {Promise<PaginatedResponse<ArticulosProcesos[]>>} - A promise with the list of articles.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<ArticulosProcesos[]>> | PaginatedResponse<ArticulosProcesos[]>>} - A promise with the list of articles.
      * @example const articles = await api.processes.articles({ proceso: 123})
      */
-    articles(params?: GetArticulosProcesos): Promise<PaginatedResponse<ArticulosProcesos[]>>;
+    articles(params?: GetArticulosProcesos, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<ArticulosProcesos[]>> | PaginatedResponse<ArticulosProcesos[]>>;
     /**
      * Get a list of documents related to a process.
      * @param {string} processCode - Process code.
-     * @returns {Promise<DocumentosProcesos[]>} - A promise with the list of documents.
+     * @returns {Promise<AxiosResponse<DocumentosProcesos[]> | DocumentosProcesos[]>} - A promise with the list of documents.
      * @example const documents = await api.processes.documents('123')
      */
-    documents(processCode: string): Promise<DocumentosProcesos[]>;
+    documents(processCode: string, withResponseMetadata?: boolean): Promise<AxiosResponse<DocumentosProcesos[]> | DocumentosProcesos[]>;
     /**
      * Get a list of global quotas for a given year.
      * If year is not provided, it will return the list for the current year.
      * @param {number} year - Year to get the global quotas for.
-     * @returns {Promise<CuotaMipymesGlobal[]>} - A promise with the list of global quotas.
+     * @returns {Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]>} - A promise with the list of global quotas.
      * @example const globalQuotas = await api.processes.globalQuota(2022)
      */
-    globalQuota(year?: number): Promise<CuotaMipymesGlobal[]>;
+    globalQuota(year?: number, withResponseMetadata?: boolean): Promise<AxiosResponse<CuotaMipymesGlobal[]> | CuotaMipymesGlobal[]>;
     /**
      * Get a list of unit quotas for a given unit code and year.
      * If unit code or year is not provided, it will return the list for the current year and all units.
@@ -468,13 +468,13 @@ declare class ProcessesAPIResource extends BaseClient {
     purcharseUnitQuota({ unitCode, year }: {
         unitCode?: number;
         year?: number;
-    }): Promise<CuotaMipymes[]>;
+    }, withResponseMetadata?: boolean): Promise<AxiosResponse<CuotaMipymes[]> | CuotaMipymes[]>;
     /**
      * Get a list of articles for the mipymes.
      * @returns {Promise<ArticulosMipymes[]>} - A promise with the list of articles.
      * @example const articles = await api.processes.mipymesArticles()
      */
-    mipymesArticles(): Promise<ArticulosMipymes[]>;
+    mipymesArticles(withResponseMetadata?: boolean): Promise<AxiosResponse<ArticulosMipymes[]> | ArticulosMipymes[]>;
 }
 
 declare class CatalogAPIResource extends BaseClient {
@@ -482,11 +482,11 @@ declare class CatalogAPIResource extends BaseClient {
     /**
      * Get a list of all catalogs.
      * @param {GetCatalogo} [params] - Parameters to filter the catalogs.
-     * @returns {Promise<PaginatedResponse<Catalogo[]>>} - A promise with the list of catalogs.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Catalogo[]>> | PaginatedResponse<Catalogo[]>>} - A promise with the list of catalogs.
      * @example const catalogs = await api.catalog.list()
      * @example const catalogs = await api.catalog.list({segmento: '123'})
      */
-    list(params?: GetCatalogo): Promise<PaginatedResponse<Catalogo[]>>;
+    list(params?: GetCatalogo, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Catalogo[]>> | PaginatedResponse<Catalogo[]>>;
 }
 
 declare class PACCResource extends BaseClient {
@@ -494,24 +494,24 @@ declare class PACCResource extends BaseClient {
     /**
      * Get a list of PACCs.
      * @param {GetPACC} [params] - Parameters to filter the PACCs.
-     * @returns {Promise<PaginatedResponse<PACC[]>>} - A promise with the list of PACCs.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<PACC[]>> | PaginatedResponse<PACC[]>>} - A promise with the list of PACCs.
      * @example const paccs = await api.pacc.list({ unidad_compra: 123 })
      */
-    list(params?: GetPACC): Promise<PaginatedResponse<PACC[]>>;
+    list(params?: GetPACC, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<PACC[]>> | PaginatedResponse<PACC[]>>;
     /**
      * Get a list of articles related to a PACC.
      * @param {GetArticulosPACC} [params] - Parameters to filter the articles.
      * @returns {Promise<PaginatedResponse<ArticulosPACC[]>>} - A promise with the list of articles.
      * @example const articles = await api.pacc.articles({ unidad_compra: 123 })
      */
-    articles(params?: GetArticulosPACC): Promise<PaginatedResponse<ArticulosPACC[]>>;
+    articles(params?: GetArticulosPACC, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<ArticulosPACC[]>> | PaginatedResponse<ArticulosPACC[]>>;
     /**
      * Get a list of adquisitions related to a PACC.
      * @param {GetAdquisicionesPACC} [params] - Parameters to filter the adquisitions.
-     * @returns {Promise<PaginatedResponse<Adquisiciones[]>>} - A promise with the list of adquisitions.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Adquisiciones[]>> | PaginatedResponse<Adquisiciones[]>>} - A promise with the list of adquisitions.
      * @example const adquisitions = await api.pacc.acquirements({ unidad_compra: 123 })
      */
-    acquirements(params?: GetAdquisicionesPACC): Promise<PaginatedResponse<Adquisiciones[]>>;
+    acquirements(params?: GetAdquisicionesPACC, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Adquisiciones[]>> | PaginatedResponse<Adquisiciones[]>>;
 }
 
 declare class PurcharseUnitsAPIResource extends BaseClient {
@@ -519,11 +519,11 @@ declare class PurcharseUnitsAPIResource extends BaseClient {
     /**
      * Get a list of purchase units.
      * @param {GetUnidadCompra} [params] - Parameters to filter the purchase units.
-     * @returns {Promise<PaginatedResponse<UnidadCompra[]>>} - A promise with the list of purchase units.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<UnidadCompra[]>> | PaginatedResponse<UnidadCompra[]>>} - A promise with the list of purchase units.
      * @example const purchaseUnits = await api.purcharseUnits.list()
      * @example const purchaseUnits = await api.purcharseUnits.list({ unidad_compra: 123 })
      **/
-    list(params?: GetUnidadCompra): Promise<PaginatedResponse<UnidadCompra[]>>;
+    list(params?: GetUnidadCompra, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<UnidadCompra[]>> | PaginatedResponse<UnidadCompra[]>>;
 }
 
 declare class SuppliersAPIResource extends BaseClient {
@@ -531,17 +531,17 @@ declare class SuppliersAPIResource extends BaseClient {
     /**
      * Get a list of all suppliers.
      * @param {GetProveedores} [params] - Parameters to filter the suppliers.
-     * @returns {Promise<PaginatedResponse<Proveedor[]>>} - A promise with the list of suppliers.
+     * @returns {Promise<AxiosResponse<PaginatedResponse<Proveedor[]>> | PaginatedResponse<Proveedor[]>>} - A promise with the list of suppliers.
      * @example const suppliers = await api.suppliers.list()
      * @example const suppliers = await api.suppliers.list({ rpe: 123 })
      */
-    list(params?: GetProveedores): Promise<PaginatedResponse<Proveedor[]>>;
+    list(params?: GetProveedores, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<Proveedor[]>> | PaginatedResponse<Proveedor[]>>;
     /**
      * Get a statistic about women in suppliers.
-     * @returns {Promise<TransparenciaMipymesMujeres>} - A promise with the statistic.
+     * @returns {Promise<AxiosResponse<TransparenciaMipymesMujeres> | TransparenciaMipymesMujeres>} - A promise with the statistic.
      * @example const statistic = await api.suppliers.womenStatistic()
      */
-    womenStatistic(): Promise<TransparenciaMipymesMujeres>;
+    womenStatistic(withResponseMetadata?: boolean): Promise<AxiosResponse<TransparenciaMipymesMujeres> | TransparenciaMipymesMujeres>;
     /**
      * Get a list of all suppliers rubro.
      * @param {GetRubroProveedor} [params] - Parameters to filter the suppliers rubro.
@@ -549,7 +549,7 @@ declare class SuppliersAPIResource extends BaseClient {
      * @example const rubro = await api.suppliers.rubro()
      * @example const rubro = await api.suppliers.rubro({ rpe: 123 })
      */
-    rubro(params: GetRubroProveedor): Promise<PaginatedResponse<RubroProveedor[]>>;
+    rubro(params: GetRubroProveedor, withResponseMetadata?: boolean): Promise<AxiosResponse<PaginatedResponse<RubroProveedor[]>> | PaginatedResponse<RubroProveedor[]>>;
 }
 
 interface MahoragaResponse<T> {
@@ -610,7 +610,7 @@ interface AppSettings {
 
 declare class Auth extends BaseClient {
     constructor(config: InternalSDKConfig);
-    login(credentials: MahoLogin): Promise<MahoragaResponse<LoginServicePayload>>;
+    login(credentials: MahoLogin, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<LoginServicePayload>> | MahoragaResponse<LoginServicePayload>>;
 }
 
 type MahoFile = {
@@ -622,36 +622,36 @@ declare class Files extends BaseClient {
     /**
      * Get a list of all files.
      * @param {PaginationRequest} [params] - Parameters to filter the files.
-     * @returns {Promise<MahoragaPaginatedResponse<MahoFileInfo[] | null>>} - A promise with the list of files.
+     * @returns {Promise<AxiosResponse<MahoragaPaginatedResponse<MahoFileInfo[] | null>> | MahoragaPaginatedResponse<MahoFileInfo[] | null>} - A promise with the list of files.
      * @example const files = await api.files.list()
      * @example const files = await api.files.list({ page: 1, limit: 10 })
      */
-    list(params: PaginationRequest): Promise<MahoragaPaginatedResponse<MahoFileInfo[] | null>>;
+    list(params: PaginationRequest, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaPaginatedResponse<MahoFileInfo[] | null>> | MahoragaPaginatedResponse<MahoFileInfo[] | null>>;
     /**
      * Upload files to the Mahoraga storage.
      * @param {MahoFile[]} files - List of files to be uploaded.
-     * @returns {Promise<MahoragaResponse<MahoFileInfo>>} - A promise with the list of uploaded files.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<MahoFileInfo>> | MahoragaResponse<MahoFileInfo>>} - A promise with the list of uploaded files.
      * @throws ValidationError - If no files are provided or if any of the files have invalid types.
      * @throws SDKError - If any of the files have invalid types.
      * @example const files = await api.files.upload([{ file: new ReadStream('file.txt'), name: 'file.txt' }])
      */
-    upload(files: MahoFile[]): Promise<MahoragaResponse<MahoFileInfo[]>>;
+    upload(files: MahoFile[], withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<MahoFileInfo[]>> | MahoragaResponse<MahoFileInfo[]>>;
     /**
      * Deletes a file from Mahoraga.
      * @param {string} fileId - The id of the file to be deleted.
-     * @returns {Promise<MahoragaResponse<string>>} - A promise with the response from the server.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<string>> | MahoragaResponse<string>>} - A promise with the response from the server.
      * @throws SDKError - If the file does not exist or if any error occurs during the deletion process.
      * @example const response = await api.files.delete('1234567890abcdef')
      */
-    delete(fileId: string): Promise<MahoragaResponse<string>>;
+    delete(fileId: string, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<string>> | MahoragaResponse<string>>;
     /**
      * Downloads a file from Mahoraga.
      * @param {string} fileId - The id of the file to be downloaded.
-     * @returns {Promise<Blob>} - A promise with the blob of the downloaded file.
+     * @returns {Promise<AxiosResponse<Buffer> | Blob>} - A promise with the blob of the downloaded file.
      * @throws SDKError - If the file does not exist or if any error occurs during the download process.
      * @example const blob = await api.files.download('1234567890abcdef')
      */
-    download(fileId: string): Promise<Buffer>;
+    download(fileId: string, withResponseMetadata?: boolean): Promise<AxiosResponse<Buffer> | Buffer>;
 }
 
 declare class Apps extends BaseClient {
@@ -659,45 +659,45 @@ declare class Apps extends BaseClient {
     /**
      * Retrieves a list of apps for a given user.
      * @param {string} userId - The id of the user.
-     * @returns {Promise<MahoragaResponse<App[]>>} - A promise with the list of apps.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<App[]>>> | MahoragaResponse<App[]>>} - A promise with the list of apps.
      * @example const response = await api.apps.list('1234567890abcdef')
      */
-    list(userId: string): Promise<MahoragaResponse<App[]>>;
+    list(userId: string, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<App[]>> | MahoragaResponse<App[]>>;
     /**
      * Creates a new app.
      * @param {Omit<App, 'id' | 'created_at' | 'updated_at'>} app - The app to be created.
-     * @returns {Promise<MahoragaResponse<App>>} - A promise with the created app.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<App>> |MahoragaResponse<App>>} - A promise with the created app.
      * @example const response = await api.apps.create({ name: 'My App', description: 'This is my app' })
      */
-    create(app: Omit<App, 'id' | 'created_at' | 'updated_at'>): Promise<MahoragaResponse<App>>;
+    create(app: Omit<App, 'id' | 'created_at' | 'updated_at'>, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<App>> | MahoragaResponse<App>>;
     /**
      * Updates an existing app.
      * @param {App} app - The app to be updated.
-     * @returns {Promise<MahoragaResponse<App>>} - A promise with the updated app.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<App>> | MahoragaResponse<App>>} - A promise with the updated app.
      * @example const response = await api.apps.update({ id: '1234567890abcdef', name: 'My Updated App' })
      */
-    update(app: App): Promise<MahoragaResponse<App>>;
+    update(app: App, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<App>> | MahoragaResponse<App>>;
     /**
      * Retrieves the settings for an app.
      * @param {string} appId - The id of the app.
-     * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the app settings.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<AppSettings>> | MahoragaResponse<AppSettings>>} - A promise with the app settings.
      * @example const response = await api.apps.getSettings('1234567890abcdef')
      */
-    getSettings(appId: string): Promise<MahoragaResponse<AppSettings>>;
+    getSettings(appId: string, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<AppSettings>> | MahoragaResponse<AppSettings>>;
     /**
      * Creates new settings for an app.
      * @param {Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>} settings - The settings to be created.
-     * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the created settings.
+     * @returns {Promise<AxiosResponse<MahoragaResponse<AppSettings>> |MahoragaResponse<AppSettings>>} - A promise with the created settings.
      * @example const response = await api.apps.createSettings({ app_id: '1234567890abcdef', max_storage_mb: 1000 })
      */
-    createSettings(settings: Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>): Promise<MahoragaResponse<AppSettings>>;
+    createSettings(settings: Omit<AppSettings, 'id' | 'created_at' | 'updated_at' | 'state'>, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<AppSettings>> | MahoragaResponse<AppSettings>>;
     /**
      * Updates the settings for an app.
      * @param {AppSettings} settings - The settings to be updated.
      * @returns {Promise<MahoragaResponse<AppSettings>>} - A promise with the updated settings.
      * @example const response = await api.apps.updateSettings({ id: '1234567890abcdef', max_storage_mb: 2000 })
      */
-    updateSettings(settings: AppSettings): Promise<MahoragaResponse<AppSettings>>;
+    updateSettings(settings: AppSettings, withResponseMetadata?: boolean): Promise<AxiosResponse<MahoragaResponse<AppSettings>> | MahoragaResponse<AppSettings>>;
 }
 
 declare class SDKError extends Error {

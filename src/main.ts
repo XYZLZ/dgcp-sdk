@@ -101,6 +101,12 @@ export function mahoraga(apiKey: string, config?: Omit<SDKConfig, 'apiKey' | 'ba
     return new Mahoraga(apiKey, config)
 }
 
+const sdk = dgcp()
+
+const res = await sdk.api.processes.list({}, true)
+console.log(res)
+
+
 export * from './types/api/api.js'
 export * from './errors/errors.js'
 export * from './types/mahoraga/api.js'
