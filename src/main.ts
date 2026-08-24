@@ -110,3 +110,4 @@ console.log(res)
 export * from './types/api/api.js'
 export * from './errors/errors.js'
 export * from './types/mahoraga/api.js'
+export * from './types/mahoraga/index.js'
